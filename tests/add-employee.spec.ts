@@ -53,4 +53,22 @@ test.describe("Add Employee", () => {
 	});
 
 	// TC-05: Save is blocked when Last Name is missing
+	test("save is blocked when Last Name is missing", async ({ page }) => {
+		const { firstName } = generateEmployeeIdentity();
+		await page.getByPlaceholder("First Name").fill(firstName);
+		await page.getByRole("button", { name: "Save" }).click();
+
+		const lastNameGroup = page
+			.locator(".oxd-input-group")
+			.filter({ hasText: "Last Name" });
+		await expect(lastNameGroup.getByText("Required")).toBeVisible();
+
+		await expect(page).toHaveURL(/\/pim\/addEmployee$/);
+		await expect(page.getByText("Successfully Saved")).not.toBeVisible();
+		await page.getByRole("link", { name: "PIM" }).click();
+		await getInputByLabel(page, "Employee Name").fill(firstName);
+		await page.getByRole("button", { name: "Search" }).click();
+
+		await expect(page.getByText(/^\(0\) Records Found$/)).toBeVisible();
+	});
 });
