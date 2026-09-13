@@ -16,7 +16,7 @@ workflows against the public OrangeHRM demo instance:
 git clone <repo-url>
 cd celero-assessment
 npm ci
-npx playwright install --with-deps
+npx playwright install --with-deps chromium
 ```
 
 `npm ci` installs the exact versions from `package-lock.json`
@@ -147,7 +147,7 @@ The timestamp component makes collisions across separate test runs unlikely.
 
 1. `git clone <repo-url> && cd celero-assessment`
 2. `npm ci`
-3. `npx playwright install --with-deps`
+3. `npx playwright install --with-deps chromium`
 4. `npx playwright test`
 5. `npx playwright show-report` to inspect results (also uploaded as a CI
    artifact by [.github/workflows/playwright.yml](.github/workflows/playwright.yml) on every push/PR to
