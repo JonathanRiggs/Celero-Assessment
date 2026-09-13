@@ -15,8 +15,8 @@ test.describe("Add Employee", () => {
 		page,
 	}) => {
 		const { firstName, lastName, employeeId } = generateEmployeeIdentity();
-		await getInputByLabel(page, "First Name").fill(firstName);
-		await getInputByLabel(page, "Last Name").fill(lastName);
+		await page.getByPlaceholder("First Name").fill(firstName);
+		await page.getByPlaceholder("Last Name").fill(lastName);
 		await getInputByLabel(page, "Employee Id").fill(employeeId);
 
 		await page.getByRole("button", { name: "Save" }).click();
@@ -30,11 +30,12 @@ test.describe("Add Employee", () => {
 		await expect(
 			page.getByRole("heading", { name: "Personal Details" }),
 		).toBeVisible();
-		await expect(getInputByLabel(page, "First Name")).toHaveValue(firstName);
-		await expect(getInputByLabel(page, "Last Name")).toHaveValue(lastName);
+		await expect(page.getByPlaceholder("First Name")).toHaveValue(firstName);
+		await expect(page.getByPlaceholder("Last Name")).toHaveValue(lastName);
 		await expect(getInputByLabel(page, "Employee Id")).toHaveValue(employeeId);
 
 		// TC-04: Newly added employee is retrievable from PIM search
+
 		await page.getByRole("link", { name: "PIM" }).click();
 		await expect(page).toHaveURL(/\/pim\/viewEmployeeList$/);
 		await getInputByLabel(page, "Employee Id").fill(employeeId);
@@ -53,4 +54,25 @@ test.describe("Add Employee", () => {
 	});
 
 	// TC-05: Save is blocked when Last Name is missing
+
+	test("save is blocked when Last Name is missing", async ({ page }) => {
+		const { firstName } = generateEmployeeIdentity();
+		await page.getByPlaceholder("First Name").fill(firstName);
+		await page.getByRole("button", { name: "Save" }).click();
+
+		const lastNameGroup = page
+			.locator(".oxd-input-group.oxd-input-field-bottom-space")
+			.filter({ has: page.getByPlaceholder("Last Name") });
+		await expect(lastNameGroup.getByText("Required")).toBeVisible();
+
+		await expect(page).toHaveURL(/\/pim\/addEmployee$/);
+		await expect(page.getByText("Successfully Saved")).not.toBeVisible();
+		await page.getByRole("link", { name: "PIM" }).click();
+		await getInputByLabel(page, "Employee Name").fill(firstName);
+		await page.getByRole("button", { name: "Search" }).click();
+
+		await expect(
+			page.locator("span", { hasText: "No Records Found" }),
+		).toBeVisible();
+	});
 });
