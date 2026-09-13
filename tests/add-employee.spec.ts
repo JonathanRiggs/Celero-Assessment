@@ -60,7 +60,7 @@ test.describe("Add Employee", () => {
 
 		const lastNameGroup = page
 			.locator(".oxd-input-group")
-			.filter({ hasText: "Last Name" });
+			.filter({ has: page.locator("label", { hasText: "Last Name" }) });
 		await expect(lastNameGroup.getByText("Required")).toBeVisible();
 
 		await expect(page).toHaveURL(/\/pim\/addEmployee$/);
